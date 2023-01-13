@@ -31,8 +31,8 @@ void DrawString(SDL_Surface* screen, int x, int y, const char* text,
 // (x, y) is the center of sprite on screen
 void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, int x, int y) {
 	SDL_Rect dest;
-	dest.x = x - sprite->w / 2;
-	dest.y = y - sprite->h / 2;
+	dest.x = x;
+	dest.y = y;
 	dest.w = sprite->w;
 	dest.h = sprite->h;
 	SDL_BlitSurface(sprite, NULL, screen, &dest);

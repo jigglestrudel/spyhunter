@@ -20,17 +20,24 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="board.cpp" />
+    <ClCompile Include="car.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="drawing_functions.cpp" />
     <ClCompile Include="spyhunter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="car.bmp" />
+    <Image Include="car_npc.bmp" />
+    <Image Include="car_player.bmp" />
+    <Image Include="car_player2.bmp" />
+    <Image Include="car_spy.bmp" />
     <Image Include="cs8x8.bmp" />
     <Image Include="eti.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="board.h" />
     <ClInclude Include="drawing_functions.h" />
+    <ClInclude Include="car.h" />
     <ClInclude Include="spyhunter.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

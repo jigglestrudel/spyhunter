@@ -6,14 +6,10 @@
 
 int main(int argc, char **argv) {
 
-	Game* game = nullptr;
-
-	game = (Game*)malloc(sizeof(Game));
+	Game_t* game = (Game_t*)malloc(sizeof(Game_t));
 	if (!game)
-	{
-		printf("Memory error\n");
 		return 1;
-	}
+
 	if (game_init(game))
 	{
 		printf("Init error\n");
@@ -21,7 +17,15 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	game_run(game);
+	// main(0, nullptr);
+
+	while (game->running)
+	{
+		game_handle_events(game);
+		game_time_update(game);
+		game_logic_update(game);
+		game_screen_update(game);
+	}
 
 	game_quit(game);
 	return 0;
