@@ -19,13 +19,7 @@ int main(int argc, char **argv) {
 
 	// main(0, nullptr);
 
-	while (game->running)
-	{
-		game_handle_events(game);
-		game_time_update(game);
-		game_logic_update(game);
-		game_screen_update(game);
-	}
+	game_run(game);
 
 	game_quit(game);
 	return 0;

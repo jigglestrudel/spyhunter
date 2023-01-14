@@ -6,32 +6,17 @@ void color_init(Game_t* game)
 	game->colorEnum->black = SDL_MapRGB(game->screen->format, 0x00, 0x00, 0x00);
 	game->colorEnum->green = SDL_MapRGB(game->screen->format, 0x00, 0xFF, 0x00);
 	game->colorEnum->red = SDL_MapRGB(game->screen->format, 0xFF, 0x00, 0x00);
-	game->colorEnum->blue = SDL_MapRGB(game->screen->format, 0x11, 0x11, 0xDD);
-}
-
-int load_one_texture(SDL_Surface** texture, const char* path)
-{
-	*(texture) = SDL_LoadBMP(path);
-	if (*(texture) == NULL) {
-		printf("Texture %s error: %s\n", path, SDL_GetError());
-		return 1;
-	}
-	return 0;
-}
-
-int texture_load(Game_t* game)
-{
-	load_one_texture(&(game->textureEnum->car_npc), "./car_npc.bmp");
-	load_one_texture(&(game->textureEnum->car_enemy), "./car_enemy.bmp");
-	load_one_texture(&(game->textureEnum->car_player), "./car_player.bmp");
-	load_one_texture(&(game->textureEnum->car_player2), "./car_player2.bmp");
-	return 0;
+	game->colorEnum->blue = SDL_MapRGB(game->screen->format, 0x00, 0x00, 0xFF);
+	game->colorEnum->yellow = SDL_MapRGB(game->screen->format, 0xFF, 0xFF, 0x00);
+	game->colorEnum->magenta = SDL_MapRGB(game->screen->format, 0xFF, 0x00, 0xFF);
+	game->colorEnum->cyan = SDL_MapRGB(game->screen->format, 0x00, 0xFF, 0xFF);
+	game->colorEnum->white = SDL_MapRGB(game->screen->format, 0xFF, 0xFF, 0xFF);
 }
 
 void game_quit(Game_t* game)
 {
+	texture_kill(game->textureEnum);
 	board_kill(game->board);
-	SDL_FreeSurface(game->charset);
 	SDL_FreeSurface(game->screen);
 	SDL_DestroyTexture(game->scrtex);
 	SDL_DestroyWindow(game->window);
@@ -56,7 +41,7 @@ int game_sdl_init(Game_t* game)
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 	SDL_RenderSetLogicalSize(game->renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 	SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255);
-	SDL_SetWindowTitle(game->window, "Spyhunter");
+	SDL_SetWindowTitle(game->window, "Spyhunter Tomasz Krêpa 193047");
 
 	game->screen = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
 	game->scrtex = SDL_CreateTexture(game->renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -66,57 +51,93 @@ int game_sdl_init(Game_t* game)
 	return 0;
 }
 
+
+int game_reset(Game_t* game)
+{
+	if (board_init(game->board) != 0)
+		return 1;
+
+	game->running = true;
+	game->paused = false;
+	game->gameOver = false;
+	game->downArrow = false;
+	game->upArrow = false;
+	game->rightArrow = false;
+	game->leftArrow = false;
+
+	game->ticks = SDL_GetTicks();
+	game->startTime = SDL_GetTicks();
+	game->lastGameUpdate = SDL_GetTicks();
+	game->lastGivenPoints = SDL_GetTicks();
+	game->timeElapsed = 0;
+
+	game->score = 0;
+
+	if (car_init(game->mainCar, PLAYER1) != 0)
+		return 1;
+	return 0;
+}
+
+
 int game_init(Game_t* game)
 {
 	if (game_sdl_init(game) != 0)
 		return 1;
 
-	if (load_one_texture( &(game->charset), "./cs8x8.bmp") != 0)
-		return 1;
-	SDL_SetColorKey(game->charset, true, 0x000000);
-
 	game->textureEnum = (TextureEnum*)malloc(sizeof(TextureEnum));
 	game->board	= (Board_t*)malloc(sizeof(Board_t));
 	game->colorEnum	= (ColorEnum*)malloc(sizeof(ColorEnum));
-	game->main_car = (Car_t*)malloc(sizeof(Car_t));
-
-	game->ticks = SDL_GetTicks();
-	game->frames = 0;
-	game->running = true;
-	game->worldTime = 0;
-	game->downArrow = false;
-	game->upArrow = false;
-	game->globalSpeed = 0;
-	game->speedT1 = SDL_GetTicks();
-	game->lastGameUpdate = SDL_GetTicks();
+	game->mainCar = (Car_t*)malloc(sizeof(Car_t));
 
 	color_init(game);
-	texture_load(game);
-	if (board_init(game->board) != 0)
+	if (texture_load(game->textureEnum) != 0)
 		return 1;
-	if (car_init(game->main_car, PLAYER1) != 0)
-		return 1;
+
+	game_reset(game);
+
 
 	return 0;
 }
 
-void game_time_update(Game_t* game)
+void game_gui_draw(Game_t* game)
 {
-	int t2 = SDL_GetTicks();
+	char str[64];
 
-	double delta = (t2 - game->ticks) * 0.001;
-	game->ticks = t2;
+	DrawString(game->screen, 2, 2, "Spy Hunter Tomasz Krepa 193047", game->textureEnum->charset, CHARSET_SIZE);
 
-	game->worldTime += delta;
+	sprintf(str, "%s", "SCORE");
+	DrawStringCentered(game->screen, SCREEN_WIDTH / 4, 30, str, game->textureEnum->bigcharset, BIGCHARSET_SIZE);
+
+	sprintf(str, "%llu", game->score);
+	DrawStringCentered(game->screen, SCREEN_WIDTH / 4 , 30+BIGCHARSET_SIZE, str, game->textureEnum->bigcharset, BIGCHARSET_SIZE);
+	
+	sprintf(str, "%d", (int)((game->timeElapsed) * 0.001));
+	DrawStringCentered(game->screen, SCREEN_WIDTH / 2, 30+BIGCHARSET_SIZE, str, game->textureEnum->bigcharset, BIGCHARSET_SIZE);
+
+	DrawString(game->screen, SCREEN_WIDTH - strlen(FINISHED_REQUIERMENTS)*CHARSET_SIZE, SCREEN_HEIGHT-CHARSET_SIZE, FINISHED_REQUIERMENTS, game->textureEnum->charset, CHARSET_SIZE);
+}
+
+void game_over_draw(Game_t* game)
+{
+	char str[64];
+
+	DrawRectangle(game->screen, (SCREEN_WIDTH - BOX_WIDTH) / 2, (SCREEN_HEIGHT - BOX_HEIGHT) / 2, BOX_WIDTH, BOX_HEIGHT, game->colorEnum->magenta, game->colorEnum->blue);
+	DrawStringCentered(game->screen, SCREEN_WIDTH / 2, (SCREEN_HEIGHT - BOX_HEIGHT) / 2 + CHARSET_SIZE,
+						"GAME OVER", game->textureEnum->bigcharset, BIGCHARSET_SIZE);
+	DrawStringCentered(game->screen, SCREEN_WIDTH/2, (SCREEN_HEIGHT - BOX_HEIGHT) / 2 + 2*BIGCHARSET_SIZE,
+						"press [n] to start a new game", game->textureEnum->charset, CHARSET_SIZE);
 }
 
 void game_screen_update(Game_t* game)
 {
 	SDL_FillRect(game->screen, NULL, game->colorEnum->black);
 
-	board_draw(game->board, game->screen, game->colorEnum->green, game->colorEnum->black);
-	car_draw(game->main_car, game->screen, game->textureEnum);
-	DrawString(game->screen, 0, 0, "Spy Hunter 193047", game->charset);
+	board_draw(game->board, game->screen, game->textureEnum->grass, game->textureEnum->tree, game->colorEnum->black);
+	car_draw(game->mainCar, game->screen, game->textureEnum);
+
+	game_gui_draw(game);
+	if (game->gameOver)
+		game_over_draw(game);
 
 	SDL_UpdateTexture(game->scrtex, NULL, game->screen->pixels, game->screen->pitch);
 	SDL_RenderCopy(game->renderer, game->scrtex, NULL, NULL);
@@ -131,17 +152,28 @@ void game_handle_events(Game_t* game)
 		case SDL_KEYDOWN:
 			if (event.key.keysym.sym == SDLK_ESCAPE)
 				game->running = false;
-
 			else if (event.key.keysym.sym == SDLK_DOWN)
 				game->downArrow = true;
 			else if (event.key.keysym.sym == SDLK_UP)
 				game->upArrow = true;
+			else if (event.key.keysym.sym == SDLK_LEFT)
+				game->leftArrow = true;
+			else if (event.key.keysym.sym == SDLK_RIGHT)
+				game->rightArrow = true;
+			else if (event.key.keysym.sym == SDLK_n)
+			{
+				game_reset(game);
+			}
 			break;
 		case SDL_KEYUP:
 			if (event.key.keysym.sym == SDLK_DOWN)
 				game->downArrow = false;
 			else if (event.key.keysym.sym == SDLK_UP)
 				game->upArrow = false;
+			else if (event.key.keysym.sym == SDLK_LEFT)
+				game->leftArrow = false;
+			else if (event.key.keysym.sym == SDLK_RIGHT)
+				game->rightArrow = false;
 			break;
 
 		default:
@@ -150,97 +182,90 @@ void game_handle_events(Game_t* game)
 	}
 }
 
-void game_speed_update(Game_t* game)
+void game_maincar_speed_update(Game_t* game)
 {
 	if (game->upArrow)
 	{
-		if (game->globalSpeed == ZERO)
-		{
-			printf("START");
-			game->globalSpeed = SLOW;
-			game->speedT1 = game->ticks;
-		}
-		else if (game->globalSpeed > ZERO && game->ticks - game->speedT1 > 150)
-		{
-			printf("PRZYSPIESZA\n");
-			game->speedT1 = game->ticks;
-
-			switch (game->globalSpeed)
-			{
-			case SLOW:
-				game->globalSpeed = MEDIUM;
-				break;
-			case MEDIUM:
-				game->globalSpeed = FAST;
-				break;
-			default:
-				break;
-			}
-		}
+		car_speed_up(game->mainCar);
 	}
 	else if (game->downArrow)
 	{
-		if (game->globalSpeed == ZERO)
+		if (game->mainCar->speed > 0)
 		{
-			game->globalSpeed = REVERSE;
+			car_hit_break(game->mainCar);
 		}
-		else if (game->globalSpeed > ZERO && game->ticks - game->speedT1 > 70)
+		else
 		{
-			printf("HAMUJE\n");
-			game->speedT1 = game->ticks;
-
-			switch (game->globalSpeed)
-			{
-			case SLOW:
-				game->globalSpeed = ZERO;
-				break;
-			case MEDIUM:
-				game->globalSpeed = SLOW;
-				break;
-			case FAST:
-				game->globalSpeed = MEDIUM;
-				break;
-			default:
-				break;
-			}
+			car_speed_up_reverse(game->mainCar);
 		}
 	}
-	else 
+	else
+	{	
+		car_slow_down(game->mainCar);
+	}
+	
+}
+
+void game_maincar_turn_update(Game_t* game)
+{
+	if (game->leftArrow)
+		car_turn_left(game->mainCar);
+	else if (game->rightArrow)
+		car_turn_right(game->mainCar);
+	else
+		car_go_straight(game->mainCar);
+}
+
+void game_maincar_add_points(Game_t* game)
+{
+	if (car_road_state(game->mainCar, game->board) == ROAD &&
+		game->mainCar->speed > 5 &&
+		game->ticks - game->lastGivenPoints > POINT_FOR_DRIVING_INTERVAL)
 	{
-		
-		if (game->globalSpeed > ZERO)
-		{
-			printf("ZWALNIA");
-
-			switch (game->globalSpeed)
-			{
-			case SLOW:
-				game->globalSpeed = ZERO;
-				break;
-			case MEDIUM:
-				game->globalSpeed = SLOW;
-				break;
-			case FAST:
-				game->globalSpeed = MEDIUM;
-				break;
-			default:
-				break;
-			}
-		}
+		game->lastGivenPoints = game->ticks;
+		game->score += POINTS_FOR_DRIVING;
 	}
-
 
 }
+
+
+void game_maincar_update(Game_t* game)
+{
+	game_maincar_speed_update(game);
+	game_maincar_turn_update(game);
+	car_hitbox_update(game->mainCar, game->mainCar->speed, game->board);
+	game_maincar_add_points(game);
+
+	if (game->mainCar->carType == WASTED)
+	{
+		game->gameOver = true;
+	}
+}
+
 
 void game_logic_update(Game_t* game)
 {
 	game->ticks = SDL_GetTicks();
-	if (game->ticks - game->lastGameUpdate > 25)
+	if (game->ticks - game->lastGameUpdate > TICK_UPDATE_CAP)
 	{
-		game_speed_update(game);
-		board_move(game->board, game->globalSpeed);
 		game->lastGameUpdate = game->ticks;
 
+		if(!game->paused && !game->gameOver)
+		{
+			game->timeElapsed = game->ticks - game->startTime;
+			game_maincar_update(game);
+			board_move(game->board, game->mainCar->speed);
+		}
+	}
+}
+
+void game_run(Game_t* game)
+{
+	while (game->running)
+	{
+		game_handle_events(game);
+		game_logic_update(game);
+		game_screen_update(game);
 	}
 }
 

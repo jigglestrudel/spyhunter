@@ -26,11 +26,12 @@
     <ClCompile Include="spyhunter.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="car.bmp" />
+    <Image Include="exploded_car.bmp" />
     <Image Include="car_npc.bmp" />
     <Image Include="car_player.bmp" />
     <Image Include="car_player2.bmp" />
     <Image Include="car_spy.bmp" />
+    <Image Include="cs16x16.bmp" />
     <Image Include="cs8x8.bmp" />
     <Image Include="eti.bmp" />
   </ItemGroup>
@@ -38,6 +39,7 @@
     <ClInclude Include="board.h" />
     <ClInclude Include="drawing_functions.h" />
     <ClInclude Include="car.h" />
+    <ClInclude Include="constants.h" />
     <ClInclude Include="spyhunter.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

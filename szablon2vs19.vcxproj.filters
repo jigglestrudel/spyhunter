@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="board.cpp" />
+    <ClCompile Include="car.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="drawing_functions.cpp" />
+    <ClCompile Include="spyhunter.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="board.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="car.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="drawing_functions.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="spyhunter.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="constants.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="cs16x16.bmp">
+      <Filter>images</Filter>
+    </Image>
+    <Image Include="car_npc.bmp">
+      <Filter>images</Filter>
+    </Image>
+    <Image Include="car_player.bmp">
+      <Filter>images</Filter>
+    </Image>
+    <Image Include="car_player2.bmp">
+      <Filter>images</Filter>
+    </Image>
+    <Image Include="car_spy.bmp">
+      <Filter>images</Filter>
+    </Image>
+    <Image Include="exploded_car.bmp">
+      <Filter>images</Filter>
+    </Image>
+    <Image Include="eti.bmp">
+      <Filter>images</Filter>
+    </Image>
+    <Image Include="cs8x8.bmp">
+      <Filter>images</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="images">
+      <UniqueIdentifier>{b2eb4660-a73b-4fc1-af2a-a2bb6c934267}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="headers">
+      <UniqueIdentifier>{e803517e-55cf-44d5-84ad-689d9543d38b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
