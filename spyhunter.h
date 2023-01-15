@@ -14,8 +14,8 @@
 
 typedef struct Game
 {
-	bool running, upArrow, downArrow, leftArrow, rightArrow, paused, gameOver;
-	int ticks, lastGameUpdate, lastGivenPoints, startTime, timeElapsed;
+	bool running, upArrow, downArrow, leftArrow, rightArrow, paused, gameOver, pointsStopped;
+	int ticks, lastGameUpdate, lastGivenPoints, startTime, timeElapsed, pointsStoppedTime, lives, pointsCounted;
 	long long unsigned score;
 	SDL_Surface* screen;
 	SDL_Texture* scrtex;

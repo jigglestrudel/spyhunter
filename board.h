@@ -1,4 +1,5 @@
 #pragma once
+#define _CRT_SECURE_NO_WARNINGS
 #include<math.h>
 #include<stdio.h>
 #include<string.h>
@@ -18,6 +19,8 @@ typedef struct Board
 }Board_t;
 
 int board_init(Board* board);
+
+int road_load_file(Board* board, const char* path);
 
 int board_get_width(Board* board, int y);
 

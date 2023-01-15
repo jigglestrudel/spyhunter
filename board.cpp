@@ -6,8 +6,29 @@ int board_init(Board* board)
 	board->skipped = 0;
 	board->delta_height = 0;
 	board->tile_height = ROAD_TILE_HEIGHT;
-	board->road_width_length = 10;
+	
+	
+
+	if (road_load_file(board, "./road.txt") != 0)
+	{
+		printf("Board loading error\n");
+		return 1;
+	}
+
+	return 0;
+}
+
+int road_load_file(Board* board, const char* path)
+{
+	int x;
+	FILE* f = fopen(path, "r");
+	if (f == NULL)
+		return 1;
+
+	fscanf(f, "%d", &(board->road_width_length));
+
 	board->road_width = (int*)malloc(sizeof(int) * board->road_width_length);
+
 	if (!board->road_width)
 	{
 		printf("Board allocation error\n");
@@ -16,10 +37,10 @@ int board_init(Board* board)
 
 	for (int i = 0; i < board->road_width_length; i++)
 	{
-		board->road_width[i] = 20 * i + 200;
+		fscanf(f, "%d", &(board->road_width[i]));
 	}
 
-	return 0;
+	fclose(f);
 }
 
 

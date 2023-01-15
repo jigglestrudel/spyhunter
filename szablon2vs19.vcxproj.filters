@@ -58,4 +58,7 @@
       <UniqueIdentifier>{e803517e-55cf-44d5-84ad-689d9543d38b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="road.txt" />
+  </ItemGroup>
 </Project>

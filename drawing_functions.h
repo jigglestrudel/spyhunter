@@ -1,6 +1,7 @@
 #pragma once
-#include<stdio.h>
-#include<string.h>
+#include <math.h>
+#include <stdio.h>
+#include <string.h>
 #include "constants.h"
 #include "./SDL2-2.0.10/include/SDL.h"
 
