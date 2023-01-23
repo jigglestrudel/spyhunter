@@ -5,8 +5,8 @@ int car_init(Car_t* car, CarTypeEnum type, int x, int y)
 	car->hitBox = (SDL_Rect*)malloc(sizeof(SDL_Rect));
 	if (!car->hitBox)
 		return 1;
-	car->hitBox->w = 30;
-	car->hitBox->h = 48;
+	car->hitBox->w = CAR_W;
+	car->hitBox->h = CAR_H;
 
 	car_respawn(car, type, x, y, 1);
 
@@ -167,7 +167,7 @@ void car_ai(Car_t* car, Car_t* other_car)
 		
 		break;
 	case NPC:
-		//car_try_to_overtake(car, other_car);
+		car_try_to_overtake(car, other_car);
 		break;
 	case ENEMY:
 		if (other_car->carType == PLAYER1)
@@ -243,16 +243,16 @@ void car_check_collision(Car_t* car, Car_t* other_car)
 	if ((car_check_collision_x(car, other_car, HITBOX_MARIGIN) && car_check_collision_y(car, other_car, HITBOX_MARIGIN))||
 		car_check_side_collision(car, other_car))
 	{
-		printf("side kick\n");
+		//printf("side kick\n");
 		other_car->lastTouchedBy = car->carType;
 		if (fabs(car->turn) - fabs(other_car->turn) > 0)
 		{
-			other_car->turn += 2*car->turn;
+			other_car->turn += OTHER_CAR_HITBACK *car->turn;
 			car->turn = -car->turn;
 		}
 		else
 		{
-			car->turn += 0.5 * other_car->turn;
+			car->turn += MAIN_CAR_HITBACK * other_car->turn;
 			other_car->turn = -other_car->turn;
 		}
 		if (car_get_middle_x(car) > car_get_middle_x(other_car))
@@ -266,7 +266,7 @@ void car_check_collision(Car_t* car, Car_t* other_car)
 	}
 	else if (car_check_bottom_collision(car, other_car))
 	{
-		printf("car_check_bottom_collision\n");
+		//printf("car_check_bottom_collision\n");
 		other_car->carType = WASTED;
 		other_car->lastTouchedBy = car->carType;
 
@@ -294,11 +294,13 @@ void car_go_back(Car_t* car)
 
 void car_try_to_overtake(Car_t* car, Car_t* other_car)
 {
-	if (car->speed > other_car->speed && car_get_middle_y(car) > car_get_middle_y(other_car))
+	if (car->speed > other_car->speed && car_get_middle_y(car) > car_get_middle_y(other_car) && car_check_collision_x(car, other_car, -20))
 	{
+		//printf("%p is_below_and_fast", car);
 		if (car_check_collision_x(car, other_car, OVERTAKING_MARIGIN - fabs(car->speed - other_car->speed)))
 		{
-			if (car_get_middle_x(car) < SCREEN_WIDTH /2 )
+			//printf(" on colision course!!!\n");
+			if (car_get_middle_x(car) > car_get_middle_x(other_car))
 			{
 				car_turn_right(car);
 			}
@@ -307,6 +309,7 @@ void car_try_to_overtake(Car_t* car, Car_t* other_car)
 				car_turn_left(car);
 			}
 		}
+		//printf("\n");
 	}
 	else
 	{
@@ -316,11 +319,12 @@ void car_try_to_overtake(Car_t* car, Car_t* other_car)
 
 void car_aim_at_target(Car_t* car, Car_t* target)
 {
+	//printf("%d", car_check_collision_y(car, target, -10));
 	if (car_check_collision_y(car, target))
 	{
+		
 		if (car->hitBox->x < target->hitBox->x)
 		{
-			car_turn_right(car);
 			car_turn_right(car);
 			car_turn_right(car);
 		}
@@ -328,12 +332,11 @@ void car_aim_at_target(Car_t* car, Car_t* target)
 		{
 			car_turn_left(car);
 			car_turn_left(car);
-			car_turn_left(car);
 		}
 	}
 	else
 	{
-		//car_go_straight(car);
+		car_go_straight(car);
 		if (car_get_middle_y(car) - car_get_middle_y(target) < 0  && car->speed - target->speed > -5)
 		{
 			car_go_back(car);

@@ -73,7 +73,7 @@ void draw_grass(SDL_Surface* screen, SDL_Surface* grass, int offset)
 	SDL_BlitSurface(grass, &rect, screen, &dst_rect);
 }
 
-void board_draw(Board* board, SDL_Surface* screen, SDL_Surface* grass, SDL_Surface* tree, Uint32 road_color)
+void board_draw(Board* board, SDL_Surface* screen, SDL_Surface* grass, SDL_Surface* tree, Uint32 road_color, Uint32 stripe_color)
 {
 	SDL_Rect rect, dst_rect;
 	int tile_width, y;
@@ -90,6 +90,8 @@ void board_draw(Board* board, SDL_Surface* screen, SDL_Surface* grass, SDL_Surfa
 
 		dst_rect = {board_get_left_edge(board, y), y, tile_width, ROAD_TILE_HEIGHT };
 		SDL_FillRect(screen, &dst_rect, road_color);
+		dst_rect = { SCREEN_WIDTH/2 - 2, y + ROAD_TILE_HEIGHT / 3, 4, ROAD_TILE_HEIGHT / 3 };
+		SDL_FillRect(screen, &dst_rect, stripe_color);
 
 		DrawSurface(screen, tree, board_get_left_edge(board, y) - TREE_DISTANCE - tree->w, y + ROAD_TILE_HEIGHT/2);
 		DrawSurface(screen, tree, board_get_right_edge(board, y) + TREE_DISTANCE, y + ROAD_TILE_HEIGHT / 2);

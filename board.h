@@ -28,7 +28,7 @@ int board_get_left_edge(Board_t* board, int y);
 
 int board_get_right_edge(Board_t* board, int y);
 
-void board_draw(Board* board, SDL_Surface* screen, SDL_Surface* grass, SDL_Surface* tree, Uint32 road_color);
+void board_draw(Board* board, SDL_Surface* screen, SDL_Surface* grass, SDL_Surface* tree, Uint32 road_color, Uint32 stripe_color);
 
 void board_move(Board* board, int d_y);
 

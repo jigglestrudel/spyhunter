@@ -195,7 +195,7 @@ void game_screen_update(Game_t* game)
 {
 	SDL_FillRect(game->screen, NULL, game->colorEnum->black);
 
-	board_draw(game->board, game->screen, game->textureEnum->grass, game->textureEnum->tree, game->colorEnum->black);
+	board_draw(game->board, game->screen, game->textureEnum->grass, game->textureEnum->tree, game->colorEnum->black, game->colorEnum->yellow);
 
 	game_draw_other_cars(game, game->screen, game->textureEnum);
 
@@ -291,7 +291,7 @@ void game_maincar_turn_update(Game_t* game)
 
 void game_maincar_add_points(Game_t* game)
 {
-	if (car_road_state(game->mainCar, game->board) == ROAD && game->mainCar->speed > 5 && game->ticks - game->lastGivenPoints > POINT_FOR_DRIVING_INTERVAL)
+	if (car_road_state(game->mainCar, game->board) == ROAD && game->mainCar->speed > 5 && game->ticks - game->lastGivenPoints > POINT_FOR_DRIVING_INTERVAL && !game->pointsStopped)
 	{
 		game->lastGivenPoints = game->ticks;
 		game->score += POINTS_FOR_DRIVING;
@@ -343,7 +343,7 @@ void game_maincar_update(Game_t* game)
 		}
 		else if (game->ticks - game->mainCar->deathTime > MAIN_RESPAWN_TIME)
 		{
-			car_respawn(game->mainCar, PLAYER1, SCREEN_WIDTH/2, MAIN_CAR_Y);
+			car_respawn(game->mainCar, PLAYER1, MAIN_CAR_X, MAIN_CAR_Y);
 		}
 	}
 }
@@ -353,11 +353,6 @@ void game_other_cars_stat_update(Game_t* game)
 	for (int i = 0; i < ENEMY_AMMOUNT; i++)
 	{
 		car_ai(game->enemyCars + i, game->mainCar);
-
-		for (int j = 0; j < NPC_AMMOUNT; j++)
-		{
-			car_ai(game->enemyCars + i, game->npcCars + j);
-		}
 		for (int j = 0; j < ENEMY_AMMOUNT; j++)
 		{
 			if (game->enemyCars + i != game->enemyCars + j)
@@ -402,7 +397,7 @@ void game_other_cars_update(Game_t* game)
 		{
 			(game->enemyCars + i)->deathTime = game->ticks;
 
-			if ((game->enemyCars + i)->lastTouchedBy == PLAYER1)
+			if ((game->enemyCars + i)->lastTouchedBy == PLAYER1 && !game->pointsStopped)
 				game->score += SCORE_FOR_ENEMY_DESTRUCTION;
 		}
 	}
