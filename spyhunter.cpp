@@ -369,6 +369,7 @@ void game_maincar_update(Game_t* game)
 		else if (game->ticks - game->mainCar->deathTime > MAIN_RESPAWN_TIME)
 		{
 			car_respawn(game->mainCar, PLAYER1, MAIN_CAR_X, MAIN_CAR_Y);
+			gun_reset(game->main_gun);
 		}
 	}
 }

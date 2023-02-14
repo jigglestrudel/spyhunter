@@ -46,6 +46,8 @@ void upgrade_kill(Upgrade* entity);
 
 void gun_init(Gun* gun);
 
+void gun_reset(Gun* gun);
+
 void gun_shoot(Gun* gun, int start_x, int start_y, int tick);
 
 void gun_bullets_update(Gun* gun, int offset);

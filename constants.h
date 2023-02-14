@@ -1,6 +1,6 @@
 #pragma once
 
-#define FINISHED_REQUIERMENTS "abcdefhijlm"
+#define FINISHED_REQUIERMENTS "abcdefhijklmn"
 
 #define SCREEN_WIDTH	640
 #define SCREEN_HEIGHT	480

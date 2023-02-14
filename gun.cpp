@@ -14,8 +14,8 @@ void bullet_shoot(Bullet* bullet, int x, int y, int upgrade)
 {
 	bullet->shot = true;
 
-	bullet->hitBox->x = x;
-	bullet->hitBox->y = y;
+	bullet->hitBox->x = x - BULLET_WIDTH/2;
+	bullet->hitBox->y = y - BULLET_HEIGHT/2;
 
 	bullet->upgraded = upgrade;
 
@@ -81,10 +81,16 @@ void gun_init(Gun* gun)
 	}
 	gun->upgrade_entity = (Upgrade*)malloc(sizeof(Upgrade));
 	upgrade_init(gun->upgrade_entity);
+	
+	gun_reset(gun);
+}
+
+void gun_reset(Gun* gun)
+{
+	upgrade_create(gun->upgrade_entity, SCREEN_WIDTH / 2, -1000, 1);
 	gun->ammo = 0;
 	gun->last_shot = 0;
 	gun->upgrade_type = 0;
-	
 }
 
 void gun_shoot(Gun* gun, int start_x, int start_y, int tick)
@@ -116,7 +122,7 @@ void gun_bullets_update(Gun* gun, int offset)
 		if ((gun->bullets + i)->shot)
 		{
 			bullet_update(gun->bullets + i, offset);
-			if ((gun->bullets + i)->hitBox->y < 0)
+			if ((gun->bullets + i)->hitBox->y < -CAR_H)
 				(gun->bullets + i)->shot = false;
 		}
 	}
@@ -138,6 +144,9 @@ bool bullet_check_collision(Bullet* bullet, SDL_Rect* hitBox)
 void upgrade_update(Upgrade* entity, int offset)
 {
 	entity->hitBox->y += offset;
+	if (entity->hitBox->y > SCREEN_HEIGHT*2 && !entity->picked_up)
+		upgrade_create(entity, SCREEN_WIDTH / 2, -1000, 1);
+
 }
 
 bool upgrade_check_collision(Upgrade* entity, SDL_Rect* hitBox)
