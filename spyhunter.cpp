@@ -157,6 +157,21 @@ void game_gui_draw(Game_t* game)
 		DrawStringCentered(game->screen, 3 * SCREEN_WIDTH / 4, 30 + BIGCHARSET_SIZE, str, game->textureEnum->bigcharset, BIGCHARSET_SIZE);
 	}
 
+	if (game->main_gun->ammo)
+	{
+		sprintf(str, "%s", "BIG AMMO");
+		DrawStringCentered(game->screen, 3 * SCREEN_WIDTH / 4, 30 + 3*BIGCHARSET_SIZE, str, game->textureEnum->bigcharset, BIGCHARSET_SIZE);
+		sprintf(str, "%d", game->main_gun->ammo);
+		DrawStringCentered(game->screen, 3 * SCREEN_WIDTH / 4, 30 + 4*BIGCHARSET_SIZE, str, game->textureEnum->bigcharset, BIGCHARSET_SIZE);
+	}
+	else
+	{
+		sprintf(str, "%s", "AMMO");
+		DrawStringCentered(game->screen, 3 * SCREEN_WIDTH / 4, 30 + 3 * BIGCHARSET_SIZE, str, game->textureEnum->bigcharset, BIGCHARSET_SIZE);
+		DrawStringCentered(game->screen, 3 * SCREEN_WIDTH / 4, 30 + 4 * BIGCHARSET_SIZE, "inf", game->textureEnum->bigcharset, BIGCHARSET_SIZE);
+
+	}
+
 	DrawString(game->screen, SCREEN_WIDTH - strlen(FINISHED_REQUIERMENTS)*CHARSET_SIZE, SCREEN_HEIGHT-CHARSET_SIZE, FINISHED_REQUIERMENTS, game->textureEnum->charset, CHARSET_SIZE);
 }
 
