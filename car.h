@@ -69,3 +69,7 @@ void car_respawn(Car_t* car, CarTypeEnum type, int x, int y, double vel = 0);
 bool car_can_respawn(Car_t* car, int ticks);
 
 void car_try_to_overtake(Car_t* car, Car_t* other_car);
+
+int car_get_middle_y(Car_t* car);
+
+int car_get_middle_x(Car_t* car);

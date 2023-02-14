@@ -6,6 +6,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="drawing_functions.cpp" />
     <ClCompile Include="spyhunter.cpp" />
+    <ClCompile Include="gun.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="board.h">
@@ -21,6 +22,9 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="constants.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="gun.h">
       <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>
@@ -47,6 +51,9 @@
       <Filter>images</Filter>
     </Image>
     <Image Include="cs8x8.bmp">
+      <Filter>images</Filter>
+    </Image>
+    <Image Include="upgrade.bmp">
       <Filter>images</Filter>
     </Image>
   </ItemGroup>

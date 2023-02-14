@@ -63,6 +63,7 @@ int game_reset(Game_t* game)
 	game->upArrow = false;
 	game->rightArrow = false;
 	game->leftArrow = false;
+	game->space = false;
 	game->pointsStopped = false;
 
 	game->lastGameUpdate = SDL_GetTicks();
@@ -91,6 +92,7 @@ int game_reset(Game_t* game)
 			return 1;
 	}
 
+	gun_init(game->main_gun);
 
 	return 0;
 }
@@ -106,6 +108,7 @@ int game_init(Game_t* game)
 	game->mainCar = (Car_t*)malloc(sizeof(Car_t));
 	game->npcCars = (Car_t*)malloc(sizeof(Car_t)*NPC_AMMOUNT);
 	game->enemyCars = (Car_t*)malloc(sizeof(Car_t)*ENEMY_AMMOUNT);
+	game->main_gun = (Gun*)malloc(sizeof(Gun));
 
 	color_init(game);
 	if (texture_load(game->textureEnum) != 0)
@@ -201,6 +204,8 @@ void game_screen_update(Game_t* game)
 
 	car_draw(game->mainCar, game->screen, game->textureEnum);
 
+	gun_draw(game->main_gun, game->screen, game->colorEnum->white, game->textureEnum->upgrade);
+
 	game_gui_draw(game);
 
 	if (game->gameOver)
@@ -229,6 +234,8 @@ void game_handle_events(Game_t* game)
 				game->leftArrow = true;
 			else if (event.key.keysym.sym == SDLK_RIGHT)
 				game->rightArrow = true;
+			else if (event.key.keysym.sym == SDLK_SPACE)
+				game->space = true;
 			else if (event.key.keysym.sym == SDLK_n)
 			{
 				game_reset(game);
@@ -247,6 +254,8 @@ void game_handle_events(Game_t* game)
 				game->leftArrow = false;
 			else if (event.key.keysym.sym == SDLK_RIGHT)
 				game->rightArrow = false;
+			else if (event.key.keysym.sym == SDLK_SPACE)
+				game->space = false;
 			break;
 
 		default:
@@ -324,6 +333,7 @@ void game_maincar_stat_update(Game_t* game)
 
 void game_maincar_update(Game_t* game)
 {
+	game_maincar_stat_update(game);
 
 	if (game->mainCar->carType != WASTED) 
 	{
@@ -355,21 +365,22 @@ void game_other_cars_stat_update(Game_t* game)
 		car_ai(game->enemyCars + i, game->mainCar);
 		for (int j = 0; j < ENEMY_AMMOUNT; j++)
 		{
-			if (game->enemyCars + i != game->enemyCars + j)
-				car_ai(game->enemyCars + i, game->enemyCars + j);
+			car_ai(game->enemyCars + i, game->enemyCars + j);
+		}
+		for (int j = 0; j < NPC_AMMOUNT; j++)
+		{
+			car_ai(game->enemyCars + i, game->npcCars + j);
 		}
 
 		if ((game->enemyCars + i)->carType != WASTED)
 		{
 			for (int j = 0; j < NPC_AMMOUNT; j++)
 			{
-				if ((game->npcCars + j)->carType != WASTED)
 				car_check_collision(game->enemyCars + i, game->npcCars + j);
 			}
 			for (int j = 0; j < ENEMY_AMMOUNT; j++)
 			{
-				if (game->enemyCars + i != game->enemyCars + j && (game->enemyCars + j)->carType != WASTED)
-					car_check_collision(game->enemyCars + i, game->enemyCars + j);
+				car_check_collision(game->enemyCars + i, game->enemyCars + j);
 			}
 		}
 	}
@@ -382,6 +393,8 @@ void game_other_cars_stat_update(Game_t* game)
 }
 void game_other_cars_update(Game_t* game)
 {
+	game_other_cars_stat_update(game);
+
 	for (int i = 0; i < ENEMY_AMMOUNT; i++)
 	{
 		car_update(game->enemyCars + i, game->mainCar->speed, game->board);
@@ -396,7 +409,6 @@ void game_other_cars_update(Game_t* game)
 		if ((game->enemyCars + i)->deathTime == 0 && (game->enemyCars + i)->carType == WASTED)
 		{
 			(game->enemyCars + i)->deathTime = game->ticks;
-
 			if ((game->enemyCars + i)->lastTouchedBy == PLAYER1 && !game->pointsStopped)
 				game->score += SCORE_FOR_ENEMY_DESTRUCTION;
 		}
@@ -406,7 +418,6 @@ void game_other_cars_update(Game_t* game)
 		if ((game->npcCars + i)->deathTime == 0 && (game->npcCars + i)->carType == WASTED)
 		{
 			(game->npcCars + i)->deathTime = game->ticks;
-
 			if ((game->npcCars + i)->lastTouchedBy == PLAYER1)
 			{
 				game->pointsStopped = true;
@@ -420,12 +431,11 @@ void game_other_cars_update(Game_t* game)
 void game_respawn_cars(Game_t* game)
 {
 
-
 	for (int i = 0; i < ENEMY_AMMOUNT; i++)
 	{
 		if (car_can_respawn(game->enemyCars + i, game->ticks))
 		{
-			car_respawn(game->enemyCars + i, ENEMY, 200 + i * 100, SCREEN_HEIGHT * 1.5 * ((i % 2) ? 1 : -1), MAX_ENEMY_SPEED);
+			car_respawn(game->enemyCars + i, ENEMY, SCREEN_WIDTH/4 + (i%SPAWN_CAR_PER_ROW)*SPAWN_GAP, SCREEN_HEIGHT * 1.5 * ((i % 2) ? 1 : -1) + SPAWN_GAP*(int)(i/SPAWN_CAR_PER_ROW), MAX_ENEMY_SPEED);
 		}
 
 	}
@@ -438,6 +448,39 @@ void game_respawn_cars(Game_t* game)
 		}
 	}
 }
+
+void game_gun_update(Game_t* game)
+{
+	if (game->space && game->mainCar->carType != WASTED)
+	{
+		gun_shoot(game->main_gun, car_get_middle_x(game->mainCar), game->mainCar->hitBox->y, game->ticks);
+	}
+
+	gun_bullets_update(game->main_gun, game->mainCar->speed);
+	upgrade_update(game->main_gun->upgrade_entity, game->mainCar->speed);
+
+	for (int i = 0; i < ENEMY_AMMOUNT; i++)
+	{
+		if (gun_bullet_collision_check(game->main_gun, (game->enemyCars + i)->hitBox))
+		{
+			(game->enemyCars + i)->carType = WASTED;
+			(game->enemyCars + i)->lastTouchedBy = PLAYER1;
+		}
+		
+	}
+	for (int i = 0; i < NPC_AMMOUNT; i++)
+	{
+		if (gun_bullet_collision_check(game->main_gun, (game->npcCars + i)->hitBox))
+		{
+			(game->npcCars + i)->carType = WASTED;
+			(game->npcCars + i)->lastTouchedBy = PLAYER1;
+		}
+	}
+
+	gun_upgrade_collision_check(game->main_gun, game->mainCar->hitBox);
+	
+}
+
 
 void game_logic_update(Game_t* game)
 {
@@ -454,10 +497,9 @@ void game_logic_update(Game_t* game)
 			}
 
 			game->timeElapsed = game->ticks - game->startTime;
-			game_other_cars_stat_update(game);
-			game_maincar_stat_update(game);
-			game_other_cars_update(game);
+			game_gun_update(game);
 			game_maincar_update(game);
+			game_other_cars_update(game);
 			board_move(game->board, game->mainCar->speed);
 			game_respawn_cars(game);
 		}

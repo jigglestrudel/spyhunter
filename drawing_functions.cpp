@@ -35,6 +35,10 @@ int texture_load(TextureEnum* textureEnum)
 	load_one_texture(&(textureEnum->exploded_car), "./exploded_car.bmp");
 	SDL_SetColorKey(textureEnum->exploded_car, true, 0x000000);
 
+	load_one_texture(&(textureEnum->upgrade), "./upgrade.bmp");
+
+	load_one_texture(&(textureEnum->eti), "./eti.bmp");
+
 	load_one_texture(&(textureEnum->grass), "./grass.bmp");
 
 	return 0;
@@ -128,10 +132,8 @@ void texture_kill(TextureEnum* txtenum)
 	SDL_FreeSurface(txtenum->car_enemy);
 	SDL_FreeSurface(txtenum->car_player);
 	SDL_FreeSurface(txtenum->car_player2);
-	// SDL_FreeSurface(txtenum->bullet);
 	SDL_FreeSurface(txtenum->tree);
-	// SDL_FreeSurface(txtenum->gun);
-	// SDL_FreeSurface(txtenum->eti);
+	SDL_FreeSurface(txtenum->eti);
 	SDL_FreeSurface(txtenum->charset);
 	SDL_FreeSurface(txtenum->bigcharset);
 	SDL_FreeSurface(txtenum->exploded_car);

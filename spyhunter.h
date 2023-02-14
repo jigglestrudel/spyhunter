@@ -9,12 +9,13 @@
 #include "drawing_functions.h"
 #include "board.h"
 #include "car.h"
+#include "gun.h"
 
 
 
 typedef struct Game
 {
-	bool running, upArrow, downArrow, leftArrow, rightArrow, paused, gameOver, pointsStopped;
+	bool running, upArrow, downArrow, leftArrow, rightArrow, paused, gameOver, pointsStopped, space;
 	int ticks, lastGameUpdate, lastGivenPoints, startTime, timeElapsed, pointsStoppedTime, lives, pointsCounted;
 	long long unsigned score;
 	SDL_Surface* screen;
@@ -30,6 +31,8 @@ typedef struct Game
 	Car_t* mainCar;
 	Car_t* enemyCars;
 	Car_t* npcCars;
+
+	Gun* main_gun;
 
 } Game_t;
 

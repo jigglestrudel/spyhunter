@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="board.cpp" />
     <ClCompile Include="car.cpp" />
+    <ClCompile Include="gun.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="drawing_functions.cpp" />
     <ClCompile Include="spyhunter.cpp" />
@@ -34,12 +35,14 @@
     <Image Include="cs16x16.bmp" />
     <Image Include="cs8x8.bmp" />
     <Image Include="eti.bmp" />
+    <Image Include="upgrade.bmp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="board.h" />
     <ClInclude Include="drawing_functions.h" />
     <ClInclude Include="car.h" />
     <ClInclude Include="constants.h" />
+    <ClInclude Include="gun.h" />
     <ClInclude Include="spyhunter.h" />
   </ItemGroup>
   <ItemGroup>

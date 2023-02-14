@@ -26,12 +26,11 @@ typedef struct TextureEnum
 	SDL_Surface* car_player;
 	SDL_Surface* car_player2;
 	SDL_Surface* tree;
-	SDL_Surface* bullet;
-	SDL_Surface* gun;
 	SDL_Surface* eti;
 	SDL_Surface* charset;
 	SDL_Surface* bigcharset;
 	SDL_Surface* grass;
+	SDL_Surface* upgrade;
 	SDL_Surface* exploded_car;
 
 }TextureEnum;

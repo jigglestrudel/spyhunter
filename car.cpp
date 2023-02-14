@@ -49,7 +49,7 @@ void car_respawn(Car_t* car, CarTypeEnum type, int x, int y, double vel)
 
 bool car_can_respawn(Car_t* car, int ticks)
 {
-	return (car->carType == WASTED && ticks - car->deathTime > RESPAWN_TIME) || abs(car->hitBox->y) > SCREEN_HEIGHT * 2;
+	return car->deathTime != 0 && (car->carType == WASTED && ticks - car->deathTime > RESPAWN_TIME) || abs(car->hitBox->y) > SCREEN_HEIGHT * 2;
 }
 
 
@@ -159,20 +159,22 @@ int car_get_middle_y(Car_t* car)
 
 void car_ai(Car_t* car, Car_t* other_car)
 {
+
 	switch (car->carType)
 	{
 	case WASTED:
 		car->speed = 0;
 		car->turn = 0;
-		
 		break;
+
 	case NPC:
 		car_try_to_overtake(car, other_car);
 		break;
+
 	case ENEMY:
 		if (other_car->carType == PLAYER1)
 			car_aim_at_target(car, other_car);
-		else
+		else if (other_car->carType == NPC)
 			car_try_to_overtake(car, other_car);
 		break;
 	default:
@@ -240,6 +242,10 @@ bool car_check_bottom_collision(Car_t* car, Car_t* other_car)
 
 void car_check_collision(Car_t* car, Car_t* other_car)
 {
+	if (car->carType == WASTED || other_car->carType == WASTED || car == other_car)
+		return;
+
+
 	if ((car_check_collision_x(car, other_car, HITBOX_MARIGIN) && car_check_collision_y(car, other_car, HITBOX_MARIGIN))||
 		car_check_side_collision(car, other_car))
 	{
@@ -247,12 +253,12 @@ void car_check_collision(Car_t* car, Car_t* other_car)
 		other_car->lastTouchedBy = car->carType;
 		if (fabs(car->turn) - fabs(other_car->turn) > 0)
 		{
-			other_car->turn += OTHER_CAR_HITBACK *car->turn;
+			other_car->turn += CAR_HITBACK *car->turn;
 			car->turn = -car->turn;
 		}
 		else
 		{
-			car->turn += MAIN_CAR_HITBACK * other_car->turn;
+			car->turn += REDUCED_CAR_HITBACK * other_car->turn;
 			other_car->turn = -other_car->turn;
 		}
 		if (car_get_middle_x(car) > car_get_middle_x(other_car))
@@ -294,10 +300,9 @@ void car_go_back(Car_t* car)
 
 void car_try_to_overtake(Car_t* car, Car_t* other_car)
 {
-	if (car->speed > other_car->speed && car_get_middle_y(car) > car_get_middle_y(other_car) && car_check_collision_x(car, other_car, -20))
-	{
-		//printf("%p is_below_and_fast", car);
-		if (car_check_collision_x(car, other_car, OVERTAKING_MARIGIN - fabs(car->speed - other_car->speed)))
+	if (car->speed > other_car->speed && car_get_middle_y(car) - car_get_middle_y(other_car) < SCREEN_HEIGHT/2 && car_get_middle_y(car) - car_get_middle_y(other_car) > 2*CAR_H)
+	{		
+		if (car_check_collision_x(car, other_car, OVERTAKING_MARIGIN))
 		{
 			//printf(" on colision course!!!\n");
 			if (car_get_middle_x(car) > car_get_middle_x(other_car))
@@ -336,7 +341,7 @@ void car_aim_at_target(Car_t* car, Car_t* target)
 	}
 	else
 	{
-		car_go_straight(car);
+		//car_go_straight(car);
 		if (car_get_middle_y(car) - car_get_middle_y(target) < 0  && car->speed - target->speed > -5)
 		{
 			car_go_back(car);
